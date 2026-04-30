@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1e1e2e;
+            color: white;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        pre {
+            background: #0f0f1a;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 20px;
+            border: 1px solid #333;
+        }
+        .success {
+            color: #10b981;
+        }
+        .error {
+            color: #ef4444;
+        }
+        input {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #2a2a3a;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Backend Test Panel</h1>
+    
+    <div style="border: 1px solid #333; padding: 20px; border-radius: 12px; margin: 20px 0;">
+        <h3>📝 Step 1: Register</h3>
+        <input type="text" id="regUsername" placeholder="Username" value="testuser">
+        <input type="email" id="regEmail" placeholder="Email" value="test@test.com">
+        <input type="password" id="regPassword" placeholder="Password" value="123456">
+        <button onclick="register()">Register</button>
+        
+        <h3>🔐 Step 2: Login</h3>
+        <input type="text" id="loginUsername" placeholder="Username" value="testuser">
+        <input type="password" id="loginPassword" placeholder="Password" value="123456">
+        <button onclick="login()">Login</button>
+        
+        <h3>➕ Step 3: Add Task (after login)</h3>
+        <input type="text" id="taskTitle" placeholder="Task Title" value="Build Astramour Project" style="width: 300px;">
+        <button onclick="addTask()">Add Task</button>
+        
+        <h3>📋 Step 4: Get Tasks</h3>
+        <button onclick="getTasks()">Get My Tasks</button>
+    </div>
+    
+    <h3>📺 Result:</h3>
+    <pre id="result">Click any button to see result...</pre>
+
+    <script>
+        async function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = 'Registering...\nUsername: ' + username;
+            
+            try {
+                const res = await fetch('http://localhost/flowtask/backend/register.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, email, password})
+                });
+                const data = await res.json();
+                resultDiv.innerText = '✅ REGISTER RESULT:\n' + JSON.stringify(data, null, 2);
+                if (data.success) {
+                    alert('✅ Registration successful! Now click Login');
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            } catch(e) {
+                resultDiv.innerText = '❌ ERROR: ' + e.message;
+            }
+        }
+        
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = 'Logging in...';
+            
+            try {
+                const res = await fetch('http://localhost/flowtask/backend/login.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+                const data = await res.json();
+                resultDiv.innerText = '✅ LOGIN RESULT:\n' + JSON.stringify(data, null, 2);
+                if (data.success) {
+                    alert('✅ Login successful! You can now add tasks.');
+                    // Store user info
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                } else {
+                    alert('❌ Login failed: ' + data.error);
+                }
+            } catch(e) {
+                resultDiv.innerText = '❌ ERROR: ' + e.message;
+            }
+        }
+        
+        async function addTask() {
+            const title = document.getElementById('taskTitle').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = 'Adding task...';
+            
+            try {
+                const res = await fetch('http://localhost/flowtask/backend/add_task.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        title: title,
+                        energy: 'high',
+                        due_date: '2026-05-15',
+                        category: 'Project'
+                    })
+                });
+                const data = await res.json();
+                resultDiv.innerText = '✅ ADD TASK RESULT:\n' + JSON.stringify(data, null, 2);
+                if (data.success) {
+                    alert('✅ Task added successfully!');
+                }
+            } catch(e) {
+                resultDiv.innerText = '❌ ERROR: ' + e.message;
+            }
+        }
+        
+        async function getTasks() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = 'Fetching tasks...';
+            
+            try {
+                const res = await fetch('http://localhost/flowtask/backend/get_tasks.php');
+                const data = await res.json();
+                resultDiv.innerText = '✅ GET TASKS RESULT:\n' + JSON.stringify(data, null, 2);
+            } catch(e) {
+                resultDiv.innerText = '❌ ERROR: ' + e.message;
+            }
+        }
+    </script>
+</body>
+</html>

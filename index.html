@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=yes">
+    <title>FlowTask Pro | Eclipse — Intelligent Workflow</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto;background:#0a0c15;color:#eef2ff;min-height:100vh;overflow-x:hidden;}
+        body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 30%,#111827,#020617);z-index:-2;}
+        body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(56,189,248,0.02) 0px,rgba(56,189,248,0.02) 2px,transparent 2px,transparent 8px);pointer-events:none;z-index:-1;}
+        ::-webkit-scrollbar{width:6px;height:6px;}
+        ::-webkit-scrollbar-track{background:#1e293b;border-radius:10px;}
+        ::-webkit-scrollbar-thumb{background:#475569;border-radius:10px;}
+        .app{display:flex;flex-direction:column;min-height:100vh;}
+        .nav-bar{background:rgba(15,23,42,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(71,85,105,0.6);padding:12px 36px;position:sticky;top:0;z-index:120;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+        .logo{font-weight:700;font-size:1.5rem;letter-spacing:-0.3px;background:linear-gradient(135deg,#60a5fa,#a78bfa,#c084fc);-webkit-background-clip:text;background-clip:text;color:transparent;}
+        .notification-bell{background:rgba(30,41,59,0.8);backdrop-filter:blur(8px);padding:8px 20px;border-radius:40px;font-weight:600;cursor:pointer;transition:0.25s;border:1px solid #334155;color:#cbd5e1;font-size:0.85rem;display:flex;align-items:center;gap:8px;}
+        .notification-bell:hover{background:#1e293b;border-color:#5b6e8c;color:#f1f5f9;transform:scale(1.02);}
+        .nav-tabs{display:flex;gap:8px;background:rgba(30,41,59,0.5);backdrop-filter:blur(12px);border-radius:60px;padding:5px;border:1px solid #334155;}
+        .tab-btn{background:transparent;border:none;padding:8px 28px;font-weight:600;border-radius:60px;cursor:pointer;transition:0.2s;color:#94a3b8;font-size:0.85rem;}
+        .tab-btn:hover{background:#334155;color:#e2e8f0;transform:translateY(-1px);}
+        .tab-btn.active{background:#3b82f6;color:white;box-shadow:0 2px 12px rgba(59,130,246,0.4);}
+        .page{display:none;padding:36px 40px;max-width:1600px;margin:0 auto;width:100%;animation:fadeSlide 0.35s ease-out;}
+        @keyframes fadeSlide{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+        .page.active{display:block;}
+        .nlp-input-area,.today-focus,.chart-container,.kanban-col,.skill-card{background:#0f172ad9;backdrop-filter:blur(16px);border-radius:28px;padding:24px;border:1px solid #1e293b;box-shadow:0 8px 20px -6px rgba(0,0,0,0.4);transition:all 0.25s ease;}
+        .nlp-input-area:hover,.today-focus:hover,.chart-container:hover,.skill-card:hover{border-color:#3b82f6;box-shadow:0 12px 28px -8px rgba(59,130,246,0.3);background:#111827e6;transform:translateY(-2px);}
+        .skill-forge-section{background:linear-gradient(105deg,#0f172a,#020617,#0f172a);border-radius:32px;padding:32px;margin-bottom:36px;border:1px solid #2d3a5e;}
+        .smart-input,input[type="text"],input[type="date"],select{width:100%;padding:12px 20px;font-size:0.9rem;border:1px solid #2d3a5e;border-radius:40px;background:#0f172a;color:#e2e8f0;transition:0.2s;}
+        .smart-input:focus,input:focus,select:focus{border-color:#3b82f6;outline:none;box-shadow:0 0 0 3px rgba(59,130,246,0.3);background:#1e293b;}
+        .energy-btn,.tech-filter{background:#1e293b;border:none;padding:6px 20px;border-radius:40px;font-weight:600;cursor:pointer;transition:0.2s;color:#cbd5e1;font-size:0.8rem;}
+        .energy-btn:hover,.tech-filter:hover{background:#334155;transform:translateY(-1px);}
+        .energy-btn.active,.tech-filter.active{background:#2563eb;color:white;box-shadow:0 2px 8px rgba(37,99,235,0.4);}
+        .complete-btn,.add-skill-btn{background:#059669;border:none;padding:8px 20px;border-radius:40px;color:white;font-weight:600;cursor:pointer;transition:0.2s;}
+        .complete-btn:hover,.add-skill-btn:hover{background:#10b981;transform:translateY(-2px);box-shadow:0 4px 12px rgba(16,185,129,0.3);}
+        .start-btn{background:#3b82f6;border:none;padding:8px 20px;border-radius:40px;color:white;font-weight:600;cursor:pointer;transition:0.2s;}
+        .start-btn:hover{background:#2563eb;transform:translateY(-2px);box-shadow:0 4px 12px rgba(59,130,246,0.3);}
+        .fab{background:#2563eb;border:none;border-radius:40px;width:56px;height:56px;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(37,99,235,0.4);cursor:pointer;color:white;transition:0.2s;}
+        .fab:hover{background:#3b82f6;transform:scale(1.05) rotate(90deg);box-shadow:0 12px 28px rgba(59,130,246,0.5);}
+        .kanban-board{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:24px;}
+        .kanban-col{min-height:560px;}
+        .col-header{font-weight:700;margin-bottom:18px;padding-bottom:12px;border-bottom:3px solid #3b82f6;color:#cbd5e1;font-size:1.1rem;}
+        .kanban-card{background:#1e293b;border-radius:20px;padding:16px;margin-bottom:14px;cursor:grab;transition:0.2s;border-left:4px solid #3b82f6;}
+        .kanban-card:hover{transform:translateX(6px);background:#2d3a5e;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+        .project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px;margin-top:24px;}
+        .deadline-badge{font-size:0.7rem;padding:4px 12px;border-radius:40px;display:inline-flex;align-items:center;gap:6px;font-weight:600;}
+        .deadline-urgent{background:#7f1a1a;color:#fecaca;animation:pulse 1s infinite;}
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
+        .deadline-warning-badge{background:#854d0e;color:#fef3c7;}
+        .deadline-safe{background:#14532d;color:#bbf7d0;}
+        .notification-panel{position:fixed;top:85px;right:32px;width:380px;background:#0f172a;backdrop-filter:blur(24px);border-radius:28px;box-shadow:0 30px 40px -15px #000000cc;z-index:150;display:none;max-height:520px;overflow-y:auto;border:1px solid #2d3a5e;}
+        .notification-panel.open{display:block;animation:slideIn 0.2s ease;}
+        @keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+        .notification-header{background:#1e293b;padding:16px 20px;font-weight:700;border-radius:28px 28px 0 0;border-bottom:1px solid #334155;color:#f1f5f9;}
+        .notification-item{padding:14px 18px;border-bottom:1px solid #1e293b;font-size:0.85rem;}
+        .notification-item.urgent{background:#450a0a;border-left:3px solid #ef4444;}
+        .notification-item.warning{background:#422006;border-left:3px solid #f59e0b;}
+        .quick-add-widget{position:fixed;bottom:30px;right:30px;z-index:200;}
+        .quick-panel{position:absolute;bottom:75px;right:0;background:#0f172a;backdrop-filter:blur(20px);width:340px;border-radius:28px;padding:24px;display:none;flex-direction:column;gap:16px;border:1px solid #334155;box-shadow:0 20px 40px -12px #000;}
+        .quick-panel.open{display:flex;animation:slideUp 0.2s ease;}
+        @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        #streakStats{background:#1e293b;border-radius:24px;padding:20px;font-weight:500;border:1px solid #2d3a5e;line-height:1.6;}
+        canvas{background:#0f172a;border-radius:24px;padding:12px;max-width:100%;height:auto;}
+        h2{font-size:1.5rem;color:#f1f5f9;font-weight:700;}
+        h3{font-size:1.2rem;margin-bottom:16px;color:#cbd5e1;font-weight:600;}
+        .text-muted{color:#94a3b8;font-size:0.8rem;}
+        .flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+        @media (max-width:1024px){.page{padding:24px 20px;}.kanban-board{gap:16px;}}
+        @media (max-width:768px){.kanban-board{grid-template-columns:1fr;}.nav-bar{flex-direction:column;align-items:stretch;padding:12px 20px;}.notification-panel{width:90%;right:5%;left:5%;top:75px;}}
+        button{cursor:pointer;}
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="nav-bar">
+        <div class="logo">⚡ FLOW<span style="color:#60a5fa; background: none;">TASK</span> PRO</div>
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+            <div class="notification-bell" id="notificationBell">
+                🔔 <span id="notificationCount">0</span> Alerts
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-page="front">📊 Dashboard</button>
+                <button class="tab-btn" data-page="medium">🎯 Board</button>
+                <button class="tab-btn" data-page="history">🚀 Portfolio</button>
+            </div>
+            <div class="authContainer">
+                  </div>
+        </div>
+    </div>
+    <div class="notification-panel" id="notificationPanel"><div class="notification-header">⏰ 3-Day Warnings</div><div id="notificationList"></div></div>
+
+    <div id="frontPage" class="page active">
+        <div class="nlp-input-area"><h3>⚡ Natural Language Input</h3><input type="text" id="nlpInput" class="smart-input" placeholder="e.g., 'Build API Gateway due May 12 high difficulty' or 'Refactor auth system tomorrow'"></div>
+        <div class="today-focus"><div class="flex-between"><h2>📌 Today's Priority</h2><div style="display:flex;gap:10px;"><button class="energy-btn active" data-energy="all">All</button><button class="energy-btn" data-energy="high">Hard</button><button class="energy-btn" data-energy="low">Moderate</button></div></div><div id="todayTaskList" style="margin-top:20px;"></div></div>
+        <div class="chart-container"><h3>⏳ Upcoming Deadlines (7 days)</h3><div id="upcomingDeadlines"></div></div>
+    </div>
+
+    <div id="mediumPage" class="page"><div style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <h2>📋 Workflow Board</h2>
+            <input type="text" id="contextFilter" placeholder="🔍 Filter by #JS, #PHP, #CSS, #HTML..." style="width: 280px; padding: 10px 20px; border-radius: 40px;">
+        </div><div class="kanban-board" id="kanbanBoard"></div></div>
+
+    <div id="historyPage" class="page">
+        <div class="skill-forge-section"><h2>📅 30-Day Portfolio Roadmap</h2><p style="color:#a5b4fc;margin-top:6px;">44 serious projects (including Astramour, Tastora, Chrome, Calculator, 1st Semester Web, Signature, Text to Handwritten, Portfolio, TicTacToe) — balanced difficulty, 3-day alerts</p><div style="display:flex;gap:12px;flex-wrap:wrap;margin:24px 0;"><button class="tech-filter active" data-tech="all">🌀 All (44)</button><button class="tech-filter" data-tech="HTML">🌐 HTML (7)</button><button class="tech-filter" data-tech="CSS">🎨 CSS (8)</button><button class="tech-filter" data-tech="JavaScript">⚡ JavaScript (15)</button><button class="tech-filter" data-tech="PHP">🐘 PHP (12)</button><button class="tech-filter" data-tech="Special">✨ Special (2)</button></div><div class="project-grid" id="skillProjectGrid"></div></div>
+        <div class="chart-container"><h3>📈 Completion Burndown 📉</h3><canvas id="burndownChart" width="400" height="200" style="max-width:100%;"></canvas></div>
+        <div class="chart-container"><h3>🏆 Progress Analytics</h3><div id="streakStats"></div></div>
+    </div>
+
+    <div class="quick-add-widget"><button class="fab" id="fabBtn">+</button><div class="quick-panel" id="quickPanel"><input type="text" id="quickTitle" placeholder="Task title"><input type="date" id="quickDueDate"><select id="quickEnergy"><option value="high">🔥 Hard / Complex</option><option value="low">🍃 Moderate</option></select><button id="quickSubmit" style="background:#3b82f6;padding:10px;border-radius:40px;border:none;color:white;font-weight:600;cursor:pointer;transition:0.2s;">Add Task</button></div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Enhanced project catalog (44+ variants incl. specified advanced projects)
+    const seriousProjects = [
+        { title: "Full Documentation Website (sidebar + sections)", category: "HTML", difficulty: "medium", tags: ["#HTML","#Docs"] },
+        { title: "Multi-Page University Website (Depts, Admissions)", category: "HTML", difficulty: "high", tags: ["#HTML","#University"] },
+        { title: "News Portal Structure (Categories, Articles)", category: "HTML", difficulty: "medium", tags: ["#HTML","#News"] },
+        { title: "SEO Blog Structure (Semantic + Schema)", category: "HTML", difficulty: "medium", tags: ["#HTML","#SEO"] },
+        { title: "Multi-Language Website Structure (i18n)", category: "HTML", difficulty: "high", tags: ["#HTML","#i18n"] },
+        { title: "Accessibility-Focused Website (ARIA)", category: "HTML", difficulty: "high", tags: ["#HTML","#A11y"] },
+        { title: "1st Semester Web (Academic Portfolio Project)", category: "HTML", difficulty: "medium", tags: ["#HTML","#Academic"] },
+        { title: "SaaS Landing Page (fully responsive)", category: "CSS", difficulty: "high", tags: ["#CSS","#SaaS"] },
+        { title: "Admin Dashboard (charts, widgets)", category: "CSS", difficulty: "high", tags: ["#CSS","#Dashboard"] },
+        { title: "E-commerce Frontend UI (product, cart)", category: "CSS", difficulty: "high", tags: ["#CSS","#Ecom"] },
+        { title: "Netflix-Style Streaming UI", category: "CSS", difficulty: "medium", tags: ["#CSS","#Stream"] },
+        { title: "Mobile-First Responsive System", category: "CSS", difficulty: "medium", tags: ["#CSS","#Mobile"] },
+        { title: "Design System (buttons, cards, tokens)", category: "CSS", difficulty: "high", tags: ["#CSS","#Design"] },
+        { title: "Advanced Animation Website", category: "CSS", difficulty: "medium", tags: ["#CSS","#Anim"] },
+        { title: "Portfolio Website (Modern Developer Portfolio)", category: "CSS", difficulty: "high", tags: ["#CSS","#Portfolio"] },
+        { title: "To-Do App with Categories & LocalStorage", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Todo"] },
+        { title: "Weather Dashboard + 5-Day API", category: "JavaScript", difficulty: "high", tags: ["#JS","#API"] },
+        { title: "Real-Time Chat UI (dynamic)", category: "JavaScript", difficulty: "high", tags: ["#JS","#Chat"] },
+        { title: "E-commerce Cart System (state management)", category: "JavaScript", difficulty: "high", tags: ["#JS","#Cart"] },
+        { title: "Kanban Board (drag & drop)", category: "JavaScript", difficulty: "high", tags: ["#JS","#Kanban"] },
+        { title: "Quiz Platform with timer & levels", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Quiz"] },
+        { title: "Music Player with Playlist", category: "JavaScript", difficulty: "high", tags: ["#JS","#Music"] },
+        { title: "Search Engine UI (dynamic filtering)", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Search"] },
+        { title: "Expense Tracker + Charts", category: "JavaScript", difficulty: "high", tags: ["#JS","#Expense"] },
+        { title: "Multi-Step Form with validation", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Form"] },
+        { title: "Notes App with categories & search", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Notes"] },
+        { title: "Calculator (Advanced Scientific Calculator)", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Calculator"] },
+        { title: "TicTacToe (AI Opponent + 2 Player)", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Game"] },
+        { title: "Text to Handwritten (Converter Tool)", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Utility"] },
+        { title: "Signature (Digital Signature Pad)", category: "JavaScript", difficulty: "medium", tags: ["#JS","#Canvas"] },
+        { title: "Auth System (Login/Signup/Reset)", category: "PHP", difficulty: "high", tags: ["#PHP","#Auth"] },
+        { title: "Full Blog CMS (Admin panel)", category: "PHP", difficulty: "high", tags: ["#PHP","#CMS"] },
+        { title: "E-commerce Backend (products, orders)", category: "PHP", difficulty: "veryhigh", tags: ["#PHP","#Ecom"] },
+        { title: "Role-Based Dashboard (RBAC)", category: "PHP", difficulty: "high", tags: ["#PHP","#RBAC"] },
+        { title: "Online Course Platform (LMS)", category: "PHP", difficulty: "veryhigh", tags: ["#PHP","#LMS"] },
+        { title: "Appointment Booking System", category: "PHP", difficulty: "high", tags: ["#PHP","#Booking"] },
+        { title: "File Management System", category: "PHP", difficulty: "medium", tags: ["#PHP","#Files"] },
+        { title: "Comment System + Moderation", category: "PHP", difficulty: "medium", tags: ["#PHP","#Comments"] },
+        { title: "REST API for frontend apps", category: "PHP", difficulty: "high", tags: ["#PHP","#API"] },
+        { title: "Freelance Marketplace Backend", category: "PHP", difficulty: "veryhigh", tags: ["#PHP","#Market"] },
+        { title: "Chat System (PHP + AJAX)", category: "PHP", difficulty: "high", tags: ["#PHP","#Chat"] },
+        { title: "Inventory Management System", category: "PHP", difficulty: "high", tags: ["#PHP","#Inv"] },
+        { title: "Astramour (Full-Stack Interactive Experience)", category: "Special", difficulty: "veryhigh", tags: ["#Special","#Astramour"] },
+        { title: "Tastora (Recipe & Meal Planner Platform)", category: "Special", difficulty: "veryhigh", tags: ["#Special","#Tastora"] },
+        { title: "Chrome (Custom Browser Extension Suite)", category: "Special", difficulty: "high", tags: ["#Special","#Chrome"] }
+    ];
+
+    let tasks = [], taskHistoryLog = [], currentEnergyFilter = "all", currentTechFilter = "all", burndownChart = null;
+
+    function generateSchedule() {
+        const start = new Date(2026, 3, 25);
+        let list = [], id = 2000;
+        seriousProjects.forEach((proj, idx) => {
+            const offset = idx % 30;
+            const due = new Date(start);
+            due.setDate(start.getDate() + offset);
+            const difficulty = (proj.difficulty === "high" || proj.difficulty === "veryhigh") ? "high" : "low";
+            list.push({
+                id: id++, title: proj.title, category: proj.category, energy: difficulty,
+                dueDate: due.toISOString().split('T')[0], completed: false, status: "todo",
+                createdAt: new Date().toISOString(), tags: proj.tags, subtasks: []
+            });
+        });
+        return list;
+    }
+
+    function init() {
+        if (localStorage.getItem('flowtask_eclipse_v2')) {
+            tasks = JSON.parse(localStorage.getItem('flowtask_eclipse_v2'));
+            taskHistoryLog = JSON.parse(localStorage.getItem('flowtask_log_eclipse_v2')) || [];
+        } else {
+            tasks = generateSchedule();
+            taskHistoryLog = tasks.map(t => ({ taskId: t.id, action: "created" }));
+            save();
+        }
+    }
+
+    function save() {
+        localStorage.setItem('flowtask_eclipse_v2', JSON.stringify(tasks));
+        localStorage.setItem('flowtask_log_eclipse_v2', JSON.stringify(taskHistoryLog));
+    }
+
+    function addTask(title, dueDate, energy) {
+        const newTask = {
+            id: Date.now(), title: title.slice(0, 80), category: "Custom", energy,
+            dueDate: dueDate || new Date().toISOString().split('T')[0], completed: false,
+            status: "todo", createdAt: new Date().toISOString(), tags: ["#Custom"], subtasks: []
+        };
+        tasks.push(newTask);
+        save();
+        renderAll();
+        checkAlerts();
+        return newTask;
+    }
+
+    function getWarnings() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return tasks.filter(t => !t.completed && t.dueDate).map(t => {
+            const due = new Date(t.dueDate);
+            due.setHours(0, 0, 0, 0);
+            const diff = Math.ceil((due - today) / 86400000);
+            return { ...t, daysLeft: diff, urgent: diff === 0 || diff === 1 };
+        }).filter(w => w.daysLeft >= 0 && w.daysLeft <= 3).sort((a, b) => a.daysLeft - b.daysLeft);
+    }
+
+    function renderNotifications() {
+        const warns = getWarnings();
+        document.getElementById("notificationCount").innerText = warns.length;
+        const container = document.getElementById("notificationList");
+        if (!warns.length) {
+            container.innerHTML = '<div class="notification-item">✨ All caught up. No critical deadlines.</div>';
+            return;
+        }
+        container.innerHTML = warns.map(w => `<div class="notification-item ${w.urgent ? 'urgent' : 'warning'}">
+            <strong>${escapeHtml(w.title.substring(0, 52))}</strong><br>📅 ${w.dueDate} · ${w.daysLeft === 0 ? '🔴 DUE TODAY' : `${w.daysLeft} day(s) left`}<br><span class="text-muted">⚡ ${w.energy === 'high' ? 'Complex Task' : 'Moderate Task'}</span></div>`).join('');
+    }
+
+    function checkAlerts() { renderNotifications(); }
+
+    function renderToday() {
+        let filtered = tasks.filter(t => !t.completed);
+        if (currentEnergyFilter !== "all") filtered = filtered.filter(t => t.energy === currentEnergyFilter);
+        filtered.sort((a, b) => (a.dueDate ? new Date(a.dueDate) : new Date(9999, 0, 1)) - (b.dueDate ? new Date(b.dueDate) : new Date(9999, 0, 1)));
+        const div = document.getElementById("todayTaskList");
+        if (!filtered.length) {
+            div.innerHTML = "<div class='text-muted' style='padding:40px; text-align:center'>🏆 Legendary: No pending tasks. Portfolio ready.</div>";
+            return;
+        }
+        div.innerHTML = filtered.slice(0, 8).map(t => `<div style="background:#1e293b; border-radius:24px; padding:16px; margin-bottom:14px; border-left:4px solid ${t.energy === 'high' ? '#f97316' : '#10b981'}">
+            <div><strong>${escapeHtml(t.title)}</strong> <span class="text-muted">${t.energy === 'high' ? '🔥 Hard' : '🌿 Moderate'}</span> ${t.dueDate ? `📅 ${t.dueDate}` : ''}</div>
+            <div style="margin-top: 12px; display:flex; gap:12px;">${t.status === 'todo' ? `<button onclick="moveToProgress(${t.id})" class="start-btn" style="padding:6px 20px;">▶ Start</button>` : ''}${t.status !== 'done' ? `<button onclick="completeTask(${t.id})" class="complete-btn" style="padding:6px 20px;">✔ Done</button>` : ''}</div>
+        </div>`).join('');
+    }
+
+    function renderProjects() {
+        let filtered = seriousProjects;
+        if (currentTechFilter !== "all") filtered = seriousProjects.filter(p => p.category === currentTechFilter);
+        const completedTitles = new Set(tasks.filter(t => t.completed).map(t => t.title));
+        const grid = document.getElementById("skillProjectGrid");
+        grid.innerHTML = filtered.map(p => `<div class="skill-card">
+            <span style="background:#2563eb30; padding:4px 14px; border-radius:40px; font-size:0.7rem; font-weight:600;">${p.category}</span>
+            <h4 style="margin: 14px 0; font-size:1rem;">${escapeHtml(p.title)}</h4>
+            <div class="text-muted">${p.tags.join(' · ')} · ${p.difficulty.includes('high') ? 'Advanced' : 'Intermediate'}</div>
+            ${!completedTitles.has(p.title) ? `<button class="add-skill-btn" style="margin-top: 18px;" onclick="markProjectComplete('${escapeHtml(p.title).replace(/'/g, "\\'")}')">🚀 Mark Complete</button>` : '<span style="background:#059669; display:inline-block; margin-top:18px; padding:8px 20px; border-radius:60px; font-weight:600;">✅ Completed</span>'}</div>`).join('');
+    }
+
+    window.markProjectComplete = (title) => {
+        const existing = tasks.find(t => t.title === title);
+        if (existing) completeTask(existing.id);
+        else {
+            const proj = seriousProjects.find(p => p.title === title);
+            if (proj) addTask(proj.title, new Date().toISOString().split('T')[0], proj.difficulty.includes('high') ? "high" : "low");
+        }
+        setTimeout(() => { renderProjects(); renderAll(); }, 80);
+    };
+
+    function renderUpcoming() {
+        const warns = getWarnings();
+        const container = document.getElementById("upcomingDeadlines");
+        if (!warns.length) { container.innerHTML = "<div class='text-muted'>🎯 No pressing deadlines. Keep momentum!</div>"; return; }
+        container.innerHTML = warns.map(w => `<div style="background:#1e293b; border-radius:24px; padding:14px; margin-bottom:12px; transition:0.2s;"><strong>${escapeHtml(w.title.substring(0, 55))}</strong><br>📆 ${w.dueDate} · ${w.daysLeft} day(s) remaining · ${w.energy === 'high' ? 'High difficulty' : 'Moderate'}</div>`).join('');
+    }
+
+    function renderKanban() {
+        let q = document.getElementById("contextFilter")?.value.toLowerCase() || "";
+        let filtered = tasks.filter(t => !q || t.tags.some(tg => tg.toLowerCase().includes(q)));
+        const todo = filtered.filter(t => t.status === "todo" && !t.completed);
+        const progress = filtered.filter(t => t.status === "progress" && !t.completed);
+        const done = filtered.filter(t => t.status === "done" || t.completed);
+        document.getElementById("kanbanBoard").innerHTML = `
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropColumn(event,'todo')"><div class="col-header">📋 Backlog (${todo.length})</div>${todo.map(t => kanbanCard(t)).join('')}</div>
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropColumn(event,'progress')"><div class="col-header">⚙️ In Progress (${progress.length})</div>${progress.map(t => kanbanCard(t)).join('')}</div>
+            <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropColumn(event,'done')"><div class="col-header">🏁 Done & Delivered (${done.length})</div>${done.map(t => kanbanCard(t)).join('')}</div>`;
+    }
+
+    function kanbanCard(t) {
+        const days = t.dueDate ? Math.ceil((new Date(t.dueDate) - new Date().setHours(0, 0, 0, 0)) / 86400000) : null;
+        let cls = "deadline-safe";
+        if (days !== null && days <= 3 && days >= 0) cls = "deadline-urgent";
+        else if (days !== null && days <= 7) cls = "deadline-warning-badge";
+        const showStart = (t.status === 'todo' && !t.completed);
+        const showComplete = (t.status !== 'done' && !t.completed);
+        return `<div class="kanban-card" draggable="true" ondragstart="dragEv(event,${t.id})"><strong>${escapeHtml(t.title.substring(0, 50))}</strong><div class="text-muted" style="font-size:11px; margin:6px 0;">${t.energy === 'high' ? '🔴 Complex' : '🟢 Moderate'} | ${t.tags?.slice(0, 1).join(',') || 'project'}</div>${t.dueDate ? `<div class="deadline-badge ${cls}">📅 ${t.dueDate} ${days !== null && days <= 3 ? `⚠️ ${days}d` : ''}</div>` : ''}<div style="margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap;">${showStart ? `<button onclick="moveToProgress(${t.id})" class="start-btn" style="padding:5px 16px;">▶ Start</button>` : ''}${showComplete ? `<button onclick="completeTask(${t.id})" class="complete-btn" style="padding:5px 16px;">✔ Complete</button>` : ''}</div></div>`;
+    }
+
+    window.moveToProgress = (id) => { let task = tasks.find(t => t.id === id); if (task && !task.completed && task.status !== 'progress') { task.status = 'progress'; save(); renderAll(); checkAlerts(); } };
+    window.completeTask = (id) => { let task = tasks.find(t => t.id === id); if (task && !task.completed) { task.completed = true; task.status = 'done'; save(); renderAll(); checkAlerts(); } };
+    window.dragEv = (e, id) => e.dataTransfer.setData("text/plain", id);
+    window.allowDrop = e => e.preventDefault();
+    window.dropColumn = (e, newSt) => { const id = parseInt(e.dataTransfer.getData("text/plain")); let task = tasks.find(t => t.id === id); if (task && !task.completed) { task.status = newSt; if (newSt === 'done') task.completed = true; save(); renderAll(); } };
+
+    function renderAnalytics() {
+        const completedCount = tasks.filter(t => t.completed).length;
+        const perc = Math.round((completedCount / tasks.length) * 100);
+        document.getElementById("streakStats").innerHTML = `🏅 Portfolio Mastery: ${completedCount}/${tasks.length} projects done (${perc}%)<br>📈 Career readiness: ${perc >= 80 ? '🚀 Elite Engineer' : perc >= 40 ? '🔥 Strong Momentum' : '💪 Foundation Building'} · ${perc}% of roadmap complete.`;
+        if (burndownChart) burndownChart.destroy();
+        const ctx = document.getElementById('burndownChart').getContext('2d');
+        burndownChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: '✅ Cumulative Completions', data: [5, 15, 27, completedCount], borderColor: '#3b82f6', backgroundColor: '#3b82f620', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#60a5fa', pointRadius: 4, pointHoverRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
+        });
+    }
+
+    function renderAll() { renderToday(); renderKanban(); renderProjects(); renderUpcoming(); renderAnalytics(); renderNotifications(); save(); }
+
+    // Event binding
+    document.getElementById("nlpInput")?.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            let val = e.target.value.trim();
+            if (val) {
+                let due = "", energy = "low";
+                let dm = val.match(/(April|May|June|July)\s+\d{1,2}|\d{4}-\d{2}-\d{2}|tomorrow/i);
+                if (dm) { if (dm[0].toLowerCase() === "tomorrow") { let t = new Date(); t.setDate(t.getDate() + 1); due = t.toISOString().split('T')[0]; } else due = dm[0]; }
+                if (/(high|hard|complex|difficult)/i.test(val)) energy = "high";
+                addTask(val, due, energy);
+                e.target.value = "";
+            }
+        }
+    });
+
+    document.querySelectorAll(".energy-btn").forEach(b => b.addEventListener("click", () => { document.querySelectorAll(".energy-btn").forEach(btn => btn.classList.remove("active")); b.classList.add("active"); currentEnergyFilter = b.getAttribute("data-energy"); renderToday(); }));
+    document.querySelectorAll(".tech-filter").forEach(b => b.addEventListener("click", () => { document.querySelectorAll(".tech-filter").forEach(f => f.classList.remove("active")); b.classList.add("active"); currentTechFilter = b.getAttribute("data-tech"); renderProjects(); }));
+    document.getElementById("notificationBell")?.addEventListener("click", (e) => { e.stopPropagation(); document.getElementById("notificationPanel").classList.toggle("open"); });
+    const fab = document.getElementById("fabBtn"), qp = document.getElementById("quickPanel");
+    fab.addEventListener("click", () => qp.classList.toggle("open"));
+    document.getElementById("quickSubmit")?.addEventListener("click", () => { let title = document.getElementById("quickTitle").value, due = document.getElementById("quickDueDate").value, energy = document.getElementById("quickEnergy").value; if (title) { addTask(title, due, energy); document.getElementById("quickTitle").value = ""; qp.classList.remove("open"); } });
+    document.getElementById("contextFilter")?.addEventListener("input", () => renderKanban());
+    document.querySelectorAll(".tab-btn").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active")); btn.classList.add("active"); let pg = btn.getAttribute("data-page") + "Page"; document.querySelectorAll(".page").forEach(p => p.classList.remove("active")); document.getElementById(pg).classList.add("active"); if (pg === "mediumPage") renderKanban(); if (pg === "historyPage") { renderProjects(); renderAnalytics(); } if (pg === "frontPage") { renderToday(); renderUpcoming(); } document.getElementById("notificationPanel").classList.remove("open"); }); });
+    function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
+    init(); renderAll(); checkAlerts(); setInterval(() => { checkAlerts(); renderUpcoming(); }, 3600000);
+    window.addEventListener('click', (e) => { if (!e.target.closest('.notification-bell') && !e.target.closest('.notification-panel')) document.getElementById("notificationPanel").classList.remove('open'); });
+<!-- LOGIN SYSTEM - Add this before </body> -->
+    // ============================================
+    // LOGIN SYSTEM FOR FLOWTASK PRO
+    // Add this entire script to your existing file
+    // ============================================
+
+    const API_URL = 'http://localhost/flowtask/backend/';
+    let currentUser = null;
+
+    // Check if user is already logged in
+    async function checkLoginStatus() {
+        const stored = localStorage.getItem('flowtask_user');
+        if (stored) {
+            currentUser = JSON.parse(stored);
+            updateUIForLoggedInUser();
+            await loadUserTasks();
+        }
+        updateAuthButtons();
+    }
+
+    // Login function
+    async function loginUser(username, password) {
+        try {
+            const res = await fetch(API_URL + 'login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentUser = data.user;
+                localStorage.setItem('flowtask_user', JSON.stringify(currentUser));
+                closeLoginModal();
+                updateUIForLoggedInUser();
+                await loadUserTasks();
+                return true;
+            } else {
+                alert('Login failed: ' + (data.error || 'Invalid credentials'));
+                return false;
+            }
+        } catch(e) {
+            alert('Connection error: ' + e.message);
+            return false;
+        }
+    }
+
+    // Register function
+    async function registerUser(username, email, password) {
+        try {
+            const res = await fetch(API_URL + 'register.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                alert('Registration successful! Please login.');
+                return true;
+            } else {
+                alert('Registration failed: ' + (data.error || 'Username/email exists'));
+                return false;
+            }
+        } catch(e) {
+            alert('Connection error: ' + e.message);
+            return false;
+        }
+    }
+
+    // Logout function
+    async function logoutUser() {
+        try {
+            await fetch(API_URL + 'logout.php', { method: 'POST' });
+        } catch(e) {}
+        currentUser = null;
+        localStorage.removeItem('flowtask_user');
+        updateUIForLoggedOutUser();
+        // Clear tasks from UI
+        if (typeof tasks !== 'undefined') {
+            tasks = [];
+            if (typeof renderAll === 'function') renderAll();
+        }
+        updateAuthButtons();
+    }
+
+    // Load tasks from backend
+    async function loadUserTasks() {
+        if (!currentUser) return;
+        try {
+            const res = await fetch(API_URL + 'get_tasks.php');
+            const data = await res.json();
+            if (data.success && typeof tasks !== 'undefined') {
+                tasks = data.tasks.map(t => ({
+                    ...t,
+                    dueDate: t.due_date,
+                    completed: t.completed == 1,
+                    tags: t.tags ? (typeof t.tags === 'string' ? JSON.parse(t.tags) : t.tags) : []
+                }));
+                if (typeof renderAll === 'function') renderAll();
+            }
+        } catch(e) {
+            console.error('Failed to load tasks:', e);
+        }
+    }
+
+    // Add task to backend
+    async function addTaskToBackend(title, dueDate, energy) {
+        if (!currentUser) {
+            alert('Please login first');
+            return false;
+        }
+        try {
+            const res = await fetch(API_URL + 'add_task.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, due_date: dueDate || null, energy, status: 'todo', completed: 0 })
+            });
+            const data = await res.json();
+            if (data.success) {
+                await loadUserTasks();
+                return true;
+            }
+            return false;
+        } catch(e) {
+            alert('Failed to add task');
+            return false;
+        }
+    }
+
+    // Update task
+    async function updateTaskBackend(taskId, status, completed) {
+        if (!currentUser) return;
+        try {
+            await fetch(API_URL + 'update_task.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task_id: taskId, status, completed: completed ? 1 : 0 })
+            });
+            await loadUserTasks();
+        } catch(e) {}
+    }
+
+    // ========== UI FUNCTIONS ==========
+    function showLoginModal() {
+        let modal = document.getElementById('loginModalSystem');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'loginModalSystem';
+            modal.className = 'login-modal';
+            modal.innerHTML = `
+                <div class="login-modal-content">
+                    <h2>🔐 Welcome Back</h2>
+                    <input type="text" id="modalUsername" placeholder="Username" autocomplete="username">
+                    <input type="password" id="modalPassword" placeholder="Password" autocomplete="current-password">
+                    <div class="login-modal-buttons">
+                        <button id="modalLoginBtn" class="login-modal-login">Login</button>
+                        <button id="modalRegisterBtn" class="login-modal-register">Create Account</button>
+                    </div>
+                    <button id="modalCloseBtn" class="login-modal-cancel">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .login-modal {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.85);
+                    backdrop-filter: blur(8px);
+                    z-index: 10000;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .login-modal.active { display: flex; }
+                .login-modal-content {
+                    background: #0f172a;
+                    border-radius: 28px;
+                    padding: 32px;
+                    width: 400px;
+                    border: 1px solid #334155;
+                    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                }
+                .login-modal-content h2 {
+                    color: #f1f5f9;
+                    text-align: center;
+                    margin-bottom: 24px;
+                }
+                .login-modal-content input {
+                    width: 100%;
+                    padding: 12px 16px;
+                    margin-bottom: 16px;
+                    border-radius: 60px;
+                    border: 1px solid #334155;
+                    background: #1e293b;
+                    color: white;
+                    font-size: 14px;
+                }
+                .login-modal-content input:focus {
+                    outline: none;
+                    border-color: #3b82f6;
+                }
+                .login-modal-buttons {
+                    display: flex;
+                    gap: 12px;
+                    margin-bottom: 12px;
+                }
+                .login-modal-login {
+                    flex: 1;
+                    background: #3b82f6;
+                    border: none;
+                    padding: 12px;
+                    border-radius: 60px;
+                    color: white;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+                .login-modal-register {
+                    flex: 1;
+                    background: #1e293b;
+                    border: 1px solid #3b82f6;
+                    padding: 12px;
+                    border-radius: 60px;
+                    color: #cbd5e1;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+                .login-modal-cancel {
+                    width: 100%;
+                    background: #334155;
+                    border: none;
+                    padding: 12px;
+                    border-radius: 60px;
+                    color: white;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+                .login-modal-login:hover, .login-modal-register:hover, .login-modal-cancel:hover {
+                    opacity: 0.9;
+                    transform: scale(0.98);
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Bind events
+            document.getElementById('modalLoginBtn').onclick = async () => {
+                const username = document.getElementById('modalUsername').value;
+                const password = document.getElementById('modalPassword').value;
+                if (username && password) await loginUser(username, password);
+                else alert('Enter username and password');
+            };
+            document.getElementById('modalRegisterBtn').onclick = async () => {
+                const username = document.getElementById('modalUsername').value;
+                const password = document.getElementById('modalPassword').value;
+                if (!username || !password) { alert('Enter username and password'); return; }
+                const email = prompt('Enter your email:', username + '@example.com');
+                if (email) await registerUser(username, email, password);
+            };
+            document.getElementById('modalCloseBtn').onclick = () => closeLoginModal();
+        }
+        modal.classList.add('active');
+    }
+
+    function closeLoginModal() {
+        const modal = document.getElementById('loginModalSystem');
+        if (modal) modal.classList.remove('active');
+    }
+
+    function updateUIForLoggedInUser() {
+        const authContainer = document.getElementById('authContainer');
+        if (authContainer && currentUser) {
+            authContainer.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span style="color: #a5b4fc;">👤 ${currentUser.username}</span>
+                    <button onclick="logoutUser()" style="background: #ef4444; border: none; padding: 6px 16px; border-radius: 60px; color: white; font-weight: 600; cursor: pointer;">Logout</button>
+                </div>
+            `;
+        }
+    }
+
+    function updateUIForLoggedOutUser() {
+        const authContainer = document.getElementById('authContainer');
+        if (authContainer) {
+            authContainer.innerHTML = `
+                <button onclick="showLoginModal()" style="background: #3b82f6; border: none; padding: 6px 20px; border-radius: 60px; color: white; font-weight: 600; cursor: pointer;">Login</button>
+            `;
+        }
+    }
+
+    function updateAuthButtons() {
+        if (currentUser) {
+            updateUIForLoggedInUser();
+        } else {
+            updateUIForLoggedOutUser();
+        }
+    }
+
+    // Add auth container to navbar (run after page loads)
+    function addAuthContainerToNavbar() {
+        const navBar = document.querySelector('.nav-bar');
+        if (navBar && !document.getElementById('authContainer')) {
+            const authDiv = document.createElement('div');
+            authDiv.id = 'authContainer';
+            authDiv.style.display = 'flex';
+            authDiv.style.alignItems = 'center';
+            navBar.appendChild(authDiv);
+            updateAuthButtons();
+        }
+    }
+
+    // Override existing addTask function if it exists
+    if (typeof window.originalAddTask === 'undefined' && typeof addTask !== 'undefined') {
+        window.originalAddTask = addTask;
+        window.addTask = function(title, dueDate, energy) {
+            if (!currentUser) {
+                alert('Please login to add tasks');
+                showLoginModal();
+                return false;
+            }
+            return addTaskToBackend(title, dueDate, energy);
+        };
+    }
+
+    // Auto-initialize when page loads
+    window.addEventListener('DOMContentLoaded', () => {
+        addAuthContainerToNavbar();
+        checkLoginStatus();
+    });
+
+    // Make functions global
+    window.showLoginModal = showLoginModal;
+    window.loginUser = loginUser;
+    window.logoutUser = logoutUser;
+    window.addTaskToBackend = addTaskToBackend;
+    window.updateTaskBackend = updateTaskBackend;
+    window.loadUserTasks = loadUserTasks;
+</script>
+</body>
+</html>
